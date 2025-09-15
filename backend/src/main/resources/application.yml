@@ -1,0 +1,73 @@
+spring:
+  application:
+    name: drive-ai-agent
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/driveai
+    username: ${DB_USERNAME:driveai_user}
+    password: ${DB_PASSWORD:driveai_password}
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+  
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - openid
+              - profile
+              - email
+              - https://www.googleapis.com/auth/drive.readonly
+              - https://www.googleapis.com/auth/documents
+              - https://www.googleapis.com/auth/spreadsheets
+            redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://www.googleapis.com/oauth2/v4/token
+            user-info-uri: https://www.googleapis.com/oauth2/v2/userinfo
+            user-name-attribute: id
+
+# Google API Configuration
+google:
+  client-id: ${GOOGLE_CLIENT_ID}
+  client-secret: ${GOOGLE_CLIENT_SECRET}
+  redirect-uri: ${GOOGLE_REDIRECT_URI:http://localhost:3000/auth/callback}
+
+# OpenAI Configuration
+openai:
+  api-key: ${OPENAI_API_KEY}
+  model: gpt-4-turbo
+  max-tokens: 4000
+  temperature: 0.7
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 7200
+      cookie:
+        secure: false
+        http-only: true
+        same-site: lax
+
+# Logging Configuration
+logging:
+  level:
+    com.driveai: DEBUG
+    org.springframework.security: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
